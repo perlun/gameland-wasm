@@ -1,0 +1,10 @@
+[package]
+name = "rustwasm"
+version = "0.1.0"
+authors = ["Per Lundberg <perlun@gmail.com>"]
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]

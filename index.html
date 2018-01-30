@@ -1,0 +1,31 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <canvas id="screen" width="320" height="200" style="border: black 1px solid; display: none;"></canvas>
+    <br/>
+
+    <script src="rustwasm.js" type="text/javascript"></script>
+
+    <input type="button" onclick="startStop();" value="Start / Stop">
+
+    <script type="text/javascript">
+      var rustWasm = new RustWasm();
+      rustWasm.prepare();
+
+      function startStop() {
+        if (rustWasm.running) {
+          rustWasm.stopAnimation();
+        }
+        else {
+          var elem = document.getElementById("screen");
+          elem.mozRequestFullScreen();
+
+          elem.style.display = 'block';
+
+          rustWasm.startAnimation();
+        }
+      }
+    </script>
+  </body>
+</html>
