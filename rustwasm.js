@@ -1,69 +1,78 @@
-class RustWasm {
-  constructor() {
-    this.ctx = null;
-    this.img = null;
-    this.pointer = null;
-    this.frame = 0;
-    this.width  = 320;
-    this.height = 200;
+fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
+  response.arrayBuffer()
+).then(bytes =>
+  WebAssembly.instantiate(bytes, {})
+).then(results => {
+  let module = {};
+  let mod = results.instance;
+  module.alloc   = mod.exports.alloc;
+  module.dealloc = mod.exports.dealloc;
+  module.fill    = mod.exports.fill;
+  module.clear   = mod.exports.clear;
 
-    this.boundStep = this.step.bind(this)
-  }
+  var width  = 320;
+  var height = 200;
 
-  prepare() {
-    fetch("feistel.wasm", { cache: "no-cache" }).then(response =>
-      response.arrayBuffer()
-    ).then(bytes =>
-      WebAssembly.instantiate(bytes, {})
-    ).then(results => {
-      let module = this.module = {};
-      let mod = results.instance;
-      module.alloc   = mod.exports.alloc;
-      module.dealloc = mod.exports.dealloc;
-      module.fill    = mod.exports.fill;
-      module.clear   = mod.exports.clear;
+  let byteSize = width * height * 4;
+  var pointer = module.alloc( byteSize );
+  var buffer = new Uint8Array(mod.exports.memory.buffer, pointer, byteSize);
 
-      let byteSize = this.width * this.height * 4;
-      this.pointer = module.alloc(byteSize);
-      var buffer = new Uint8Array(mod.exports.memory.buffer, this.pointer, byteSize);
+  var button = document.getElementById("run-wasm");
+  var canvas = document.getElementById('screen');
+  if (canvas.getContext) {
+    var ctx = canvas.getContext('2d');
 
-      var canvas = document.getElementById('screen');
+    var pointer = module.alloc( byteSize );
 
-      if (canvas.getContext) {
-        this.ctx = canvas.getContext('2d');
-        this.pointer = module.alloc(byteSize);
+    var usub = new Uint8ClampedArray(mod.exports.memory.buffer, pointer, byteSize);
+    var img = new ImageData(usub, width, height);
+    var running = false;
 
-        var usub = new Uint8ClampedArray(mod.exports.memory.buffer, this.pointer, byteSize);
-        this.img = new ImageData(usub, this.width, this.height);
+    var frame = 0;
+    var running = false;
+    function step(timestamp) {
+      if (!running) return;
+
+      frame = module.fill(pointer, width, height, frame);
+      ctx.putImageData(img, 0, 0)
+
+      if (frame != 65536) {
+        window.requestAnimationFrame(step);
+      } else {
+        button.innerText = "Restart";
+        running = false;
+      }
+    }
+
+    function clearCanvasAndRestart() {
+      running = false;
+      window.requestAnimationFrame(function() {
+        ctx.clearRect(0, 0, width, height);
+        module.clear(pointer, width, height);
+        frame = 0;
+        running = true;
+        window.requestAnimationFrame(step);
+      });
+    }
+
+    button.addEventListener("click", function(e) {
+      if (running) {
+        button.innerText = "Restart";
+        running = false;;
+      } else {
+        var elem = document.getElementById("screen");
+
+        if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        }
+        else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        }
+        elem.style.display = 'block';
+
+        button.innerText = "Stop";
+        clearCanvasAndRestart();
       }
     });
   }
-
-  step(timestamp) {
-    if (!this.running) {
-      return;
-    }
-
-    this.frame = this.module.fill(this.pointer, this.width, this.height, this.frame);
-    // this.ctx.putImageData(this.img, 0, 0)
-    console.log(this.frame);
-
-    window.requestAnimationFrame(this.boundStep);
-  }
-
-  startAnimation() {
-    this.running = true;
-
-    let animationFunction = function() {
-      this.ctx.clearRect(0, 0, this.width, this.height);
-      this.module.clear(this.pointer, this.width, this.height);
-      this.frame = 0;
-      window.requestAnimationFrame(this.boundStep);
-    }.bind(this);
-    window.requestAnimationFrame(animationFunction);
-  }
-
-  stopAnimation() {
-    this.running = false;
-  }
-}
+});
