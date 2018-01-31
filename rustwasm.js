@@ -58,8 +58,21 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
     button.addEventListener("click", function(e) {
       if (running) {
         button.innerText = "Restart";
-        running = false;;
+        running = false;
+        window.module.stop();
       } else {
+        window.module = new Modplayer();
+        window.module.setrepeat(true);
+        window.module.onReady = () => {
+          window.module.play();
+
+          var elem = document.getElementById("screen");
+          elem.style.display = 'block';
+
+          clearCanvasAndRestart();
+        }
+        window.module.load("music.mod");
+
         var elem = document.getElementById("screen");
 
         if (elem.mozRequestFullScreen) {
@@ -68,10 +81,7 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
         else if (elem.webkitRequestFullscreen) {
           elem.webkitRequestFullscreen();
         }
-        elem.style.display = 'block';
-
         button.innerText = "Stop";
-        clearCanvasAndRestart();
       }
     });
   }

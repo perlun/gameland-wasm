@@ -12,19 +12,10 @@
     <br/>
 
     <script src="rustwasm.js" type="text/javascript"></script>
+    <script src="webaudio-mod-player/utils.js" type="text/javascript"></script>
+    <script src="webaudio-mod-player/player.js" type="text/javascript"></script>
+    <script src="webaudio-mod-player/pt.js" type="text/javascript"></script>
 
     <input type="button" id="run-wasm" value="Start / Stop">
-
-    <script type="text/javascript">
-      function startStop() {
-        if (rustWasm.running) {
-          rustWasm.stopAnimation();
-        }
-        else {
-
-          rustWasm.startAnimation();
-        }
-      }
-    </script>
   </body>
 </html>

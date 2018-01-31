@@ -52,9 +52,9 @@ pub fn fill(pointer: *mut u8, width: usize, height: usize, mut frame: u32) -> u3
 
     unsafe {
         if DIRECTION {
-            COLOR += 32;
+            COLOR += 16;
         } else {
-            COLOR -= 32;
+            COLOR -= 16;
         }
 
         if COLOR == 0 {
@@ -62,7 +62,7 @@ pub fn fill(pointer: *mut u8, width: usize, height: usize, mut frame: u32) -> u3
         }
         else if COLOR == 256 {
             DIRECTION = !DIRECTION;
-            COLOR -= 32; // avoid overflow
+            COLOR -= 16; // avoid overflow
         }
 
         frame += 1;
