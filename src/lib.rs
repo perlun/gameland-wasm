@@ -1,4 +1,5 @@
 use std::mem;
+use std::ptr;
 use std::slice;
 use std::os::raw::c_void;
 
@@ -17,19 +18,27 @@ pub extern "C" fn dealloc(ptr: *mut c_void, cap: usize) {
     }
 }
 
+const WIDTH: u16 = 320;
+const HEIGHT: u16 = 200;
+const IMAGE_LENGTH: usize = WIDTH as usize * HEIGHT as usize * 4;
 static mut COLOR: u16 = 0;
 static mut DIRECTION: bool = true;
 
-unsafe fn set_pixel(pixels: &mut [u8], width: u16, x: u16, y: u16) {
-    let x = x as usize;
-    let y = y as usize;
-    let width = width as usize;
-    let offset = x * 4 + y * 4 * width;
+static PALETTE: &[u8] = include_bytes!("gameland.pal");
 
-    pixels[(offset + 0)] = COLOR as u8;
-    pixels[(offset + 1)] = COLOR as u8;
-    pixels[(offset + 2)] = COLOR as u8;
-    pixels[(offset + 3)] = 255;
+// MCGA 320x200 image, where each color byte is an index into the RGB palette.
+static PALETTE_BASED_IMAGE: &[u8] = include_bytes!("gameland.raw");
+static mut IMAGE: [u8; IMAGE_LENGTH] = [0; IMAGE_LENGTH];
+
+pub unsafe fn prepare() {
+    for x in 0..WIDTH {
+        for y in 0..HEIGHT {
+            let source_index = (y * WIDTH + x) as usize;
+            let target_index = ((y * WIDTH + x) * 4) as usize;
+            let palette_index = (PALETTE_BASED_IMAGE[source_index as usize] * 3) as usize;
+            IMAGE[target_index + 0] = PALETTE[palette_index + 0];
+        }
+    }
 }
 
 #[no_mangle]
@@ -70,12 +79,26 @@ pub fn fill(pointer: *mut u8, width: usize, height: usize, mut frame: u32) -> u3
         //     return frame;
         // }
 
-        for x in 0..320 {
-            for y in 0..200 {
-                set_pixel(buf, width, x, y);
-            }
-        }
+        ptr::copy_nonoverlapping(&IMAGE, pointer, IMAGE_LENGTH);
+
+        // for x in 0..WIDTH {
+        //     for y in 0..HEIGHT {
+        //         set_pixel(buf, width, x, y);
+        //     }
+        // }
     }
 
     frame
+}
+
+unsafe fn set_pixel(pixels: &mut [u8], width: u16, x: u16, y: u16) {
+    let x = x as usize;
+    let y = y as usize;
+    let width = width as usize;
+    let offset = x * 4 + y * 4 * width;
+
+    pixels[(offset + 0)] = COLOR as u8;
+    pixels[(offset + 1)] = COLOR as u8;
+    pixels[(offset + 2)] = COLOR as u8;
+    pixels[(offset + 3)] = 255;
 }
