@@ -18,8 +18,8 @@ pub extern "C" fn dealloc(ptr: *mut c_void, cap: usize) {
     }
 }
 
-const WIDTH: u16 = 320;
-const HEIGHT: u16 = 200;
+const WIDTH: usize = 320;
+const HEIGHT: usize = 200;
 const IMAGE_LENGTH: usize = WIDTH as usize * HEIGHT as usize * 4;
 static mut COLOR: u16 = 0;
 static mut DIRECTION: bool = true;
@@ -30,13 +30,26 @@ static PALETTE: &[u8] = include_bytes!("gameland.pal");
 static PALETTE_BASED_IMAGE: &[u8] = include_bytes!("gameland.raw");
 static mut IMAGE: [u8; IMAGE_LENGTH] = [0; IMAGE_LENGTH];
 
+#[no_mangle]
 pub unsafe fn prepare() {
     for x in 0..WIDTH {
         for y in 0..HEIGHT {
-            let source_index = (y * WIDTH + x) as usize;
-            let target_index = ((y * WIDTH + x) * 4) as usize;
-            let palette_index = (PALETTE_BASED_IMAGE[source_index as usize] * 3) as usize;
+            let source_index = y * WIDTH + x;
+            let target_index = (y * WIDTH + x) * 4;
+            let palette_index = PALETTE_BASED_IMAGE[source_index] as usize * 3;
+
+            IMAGE[target_index + 3] = 255;
+
+            // if palette_index == 0 {
+            //     continue;
+            // }
+
+            // 120 = turkos
+            // 012 = nästan rätt, men viss smoothning tappas så att
+
             IMAGE[target_index + 0] = PALETTE[palette_index + 0];
+            IMAGE[target_index + 1] = PALETTE[palette_index + 1];
+            IMAGE[target_index + 2] = PALETTE[palette_index + 2];
         }
     }
 }
@@ -79,23 +92,28 @@ pub fn fill(pointer: *mut u8, width: usize, height: usize, mut frame: u32) -> u3
         //     return frame;
         // }
 
-        ptr::copy_nonoverlapping(&IMAGE, pointer, IMAGE_LENGTH);
+        buf.copy_from_slice(&IMAGE);
 
-        // for x in 0..WIDTH {
-        //     for y in 0..HEIGHT {
-        //         set_pixel(buf, width, x, y);
-        //     }
-        // }
+        for x in 0..WIDTH {
+            for y in 0..HEIGHT {
+                set_pixel(buf, width, x, y);
+            }
+        }
     }
 
     frame
 }
 
-unsafe fn set_pixel(pixels: &mut [u8], width: u16, x: u16, y: u16) {
-    let x = x as usize;
-    let y = y as usize;
+unsafe fn set_pixel(pixels: &mut [u8], width: u16, x: usize, y: usize) {
     let width = width as usize;
     let offset = x * 4 + y * 4 * width;
+
+    // We only overwrite the background-color pixels.
+    if pixels[offset + 0] != 0 &&
+       pixels[offset + 1] != 0 &&
+       pixels[offset + 2] != 0 {
+        return;
+    }
 
     pixels[(offset + 0)] = COLOR as u8;
     pixels[(offset + 1)] = COLOR as u8;

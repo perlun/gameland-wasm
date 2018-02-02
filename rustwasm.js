@@ -66,7 +66,7 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
         window.module = new Modplayer();
         window.module.setrepeat(true);
         window.module.onReady = () => {
-          //window.module.play();
+          window.module.play();
 
           var elem = document.getElementById("screen");
           elem.style.display = 'block';
@@ -81,7 +81,7 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
           elem.mozRequestFullScreen();
         }
         else if (elem.webkitRequestFullscreen) {
-          //elem.webkitRequestFullscreen();
+          elem.webkitRequestFullscreen();
         }
         button.innerText = "Stop";
       }
