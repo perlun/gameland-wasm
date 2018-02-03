@@ -68,17 +68,17 @@ pub fn fill(pointer: *mut u8, width: usize, height: usize, mut frame: u32) -> u3
 
     unsafe {
         if DIRECTION {
-            COLOR += 16;
+            COLOR += 4;
         } else {
-            COLOR -= 16;
+            COLOR -= 4;
         }
 
         if COLOR == 0 {
             DIRECTION = !DIRECTION;
         }
-        else if COLOR == 256 {
+        else if COLOR == 128 {
             DIRECTION = !DIRECTION;
-            COLOR -= 16; // avoid overflow
+            COLOR -= 4; // avoid overflow
         }
 
         frame += 1;
@@ -102,10 +102,11 @@ unsafe fn set_pixel(pixels: &mut [u8], width: u16, x: usize, y: usize) {
     let width = width as usize;
     let offset = x * 4 + y * 4 * width;
 
-    // We only overwrite the background-color pixels.
-    if pixels[offset + 0] != 0 &&
-       pixels[offset + 1] != 0 &&
-       pixels[offset + 2] != 0 {
+    // We only overwrite the background pixels, ie #000000 and also other very dark colors (since the image data
+    // contains some dark/almost black pixels at the edges of the image)
+    if pixels[offset + 0] > 60 ||
+       pixels[offset + 1] > 60 ||
+       pixels[offset + 2] > 60 {
         return;
     }
 
