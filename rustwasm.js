@@ -13,6 +13,8 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
   var width  = 320;
   var height = 200;
 
+  mod.exports.prepare();
+
   let byteSize = width * height * 4;
   var pointer = module.alloc( byteSize );
   var buffer = new Uint8Array(mod.exports.memory.buffer, pointer, byteSize);
