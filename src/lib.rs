@@ -1,5 +1,4 @@
 use std::mem;
-use std::ptr;
 use std::slice;
 use std::os::raw::c_void;
 
@@ -40,16 +39,11 @@ pub unsafe fn prepare() {
 
             IMAGE[target_index + 3] = 255;
 
-            // if palette_index == 0 {
-            //     continue;
-            // }
-
-            // 120 = turkos
-            // 012 = nästan rätt, men viss smoothning tappas så att
-
-            IMAGE[target_index + 0] = PALETTE[palette_index + 0];
-            IMAGE[target_index + 1] = PALETTE[palette_index + 1];
-            IMAGE[target_index + 2] = PALETTE[palette_index + 2];
+            // The palette in the file is 0-255, but the upper two bits (which the VGA hardware ignores) contain garbage.
+            // The algorithm works around that, and converts the 18-bit VGA palette entry to a 24-bit color.
+            IMAGE[target_index + 0] = (PALETTE[palette_index + 0] & 63) * 4;
+            IMAGE[target_index + 1] = (PALETTE[palette_index + 1] & 63) * 4;
+            IMAGE[target_index + 2] = (PALETTE[palette_index + 2] & 63) * 4;
         }
     }
 }
