@@ -21,6 +21,7 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
 
   var button = document.getElementById("run-wasm");
   var canvas = document.getElementById('screen');
+
   if (canvas.getContext) {
     var ctx = canvas.getContext('2d');
 
@@ -32,6 +33,7 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
 
     var frame = 0;
     var running = false;
+
     function step(timestamp) {
       if (!running) return;
 
@@ -47,6 +49,9 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
     }
 
     function clearCanvasAndRestart() {
+      var elem = document.getElementById('screen');
+      elem.style.display = 'block';
+
       running = false;
       window.requestAnimationFrame(function() {
         ctx.clearRect(0, 0, width, height);
@@ -57,25 +62,41 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
       });
     }
 
-    button.addEventListener("click", function(e) {
+    function stopDemo() {
+      var elem = document.getElementById('screen');
+      elem.style.display = 'none';
+
+      running = false;
+      window.module.stop();
+    }
+
+    function exitHandler() {
+      if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+        stopDemo();
+      }
+      else {
+        clearCanvasAndRestart();
+      }
+    }
+
+    button.addEventListener('click', function(e) {
       if (running) {
-        button.innerText = "Restart";
-        running = false;
-        window.module.stop();
+        stopDemo();
       } else {
         window.module = new Modplayer();
         window.module.setrepeat(true);
         window.module.onReady = () => {
           window.module.play();
-
-          var elem = document.getElementById("screen");
-          elem.style.display = 'block';
-
-          clearCanvasAndRestart();
         }
-        window.module.load("music.mod");
+        window.module.load('music.mod');
 
-        var elem = document.getElementById("screen");
+        // FIXME: use fscreen instead of this mess.
+        document.addEventListener('webkitfullscreenchange', exitHandler, false);
+        document.addEventListener('mozfullscreenchange', exitHandler, false);
+        document.addEventListener('fullscreenchange', exitHandler, false);
+        document.addEventListener('MSFullscreenChange', exitHandler, false);
+
+        var elem = document.getElementById('screen');
 
         if (elem.mozRequestFullScreen) {
           elem.mozRequestFullScreen();
@@ -83,7 +104,6 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
         else if (elem.webkitRequestFullscreen) {
           elem.webkitRequestFullscreen();
         }
-        button.innerText = "Stop";
       }
     });
   }
