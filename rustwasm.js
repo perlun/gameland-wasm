@@ -1,4 +1,4 @@
-fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
+fetch("gameland.wasm", {cache: "no-cache"}).then(response =>
   response.arrayBuffer()
 ).then(bytes =>
   WebAssembly.instantiate(bytes, {})
