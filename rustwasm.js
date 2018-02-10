@@ -25,7 +25,7 @@ fetch("feistel.wasm", {cache: "no-cache"}).then(response =>
   if (canvas.getContext) {
     var ctx = canvas.getContext('2d');
 
-    var pointer = module.alloc( byteSize );
+    var pointer = module.alloc(byteSize);
 
     var usub = new Uint8ClampedArray(mod.exports.memory.buffer, pointer, byteSize);
     var img = new ImageData(usub, width, height);
