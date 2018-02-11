@@ -125,8 +125,8 @@ static mut TEXT_POSITION: isize = WIDTH as isize;
 static TEXT_BASE_ROW: usize = HEIGHT - 8 * 2;
 static SCROLL_TEXT: &str = "\
 this is a webassembly/rust retrofit of an age-old intro made in a \
-completely different era of computing. hardware capacity was limited, but \
-a lot of great people were doing their best to get the most out of the \
+completely different age of computing. hardware capacity was limited, but \
+a lot of great people were doing their best to squeeze the most out of the \
 machines. greetings goes to jojo, bagder, hal and javax. obsolete text \
 from the original intro will follow.   gameland! our favourite party is \
 alive and kicking butt. please don't be afraid to join the \

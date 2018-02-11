@@ -1,3 +1,8 @@
+// gameland.js - loads the WebAssembly binary and sets up the system for
+// running the demo.
+//
+// Heavily inspired by https://www.hellorust.com/demos/feistel/index.html
+
 fetch("gameland.wasm", {cache: "no-cache"}).then(response =>
   response.arrayBuffer()
 ).then(bytes =>
@@ -16,7 +21,7 @@ fetch("gameland.wasm", {cache: "no-cache"}).then(response =>
   mod.exports.prepare();
 
   let byteSize = width * height * 4;
-  var pointer = module.alloc( byteSize );
+  var pointer = module.alloc(byteSize);
   var buffer = new Uint8Array(mod.exports.memory.buffer, pointer, byteSize);
 
   var button = document.getElementById("run-wasm");
