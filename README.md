@@ -2,10 +2,12 @@
 
 Very simple WebAssembly demo using Rust.
 
+See it live in action on this page: http://perlun.eu.org/en/programming/gameland/
+
 This is a port of an original [MS-DOS](https://en.wikipedia.org/wiki/MS-DOS)
-intro I made back in 1997. I don't have the source to it any longer, but
-here is a video that shows it live in action:
-https://www.youtube.com/watch?v=kkfwCpdItks
+intro I made back in 1997. (I don't have the source to it any longer, but
+here is a video that shows the old intro live in action:
+https://www.youtube.com/watch?v=kkfwCpdItks)
 
 The idea here was to:
 
