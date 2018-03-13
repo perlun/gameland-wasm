@@ -71,25 +71,26 @@ pub fn fill(pointer: *mut u8, width: usize, height: usize, mut frame: u32) -> u3
     let width = width as u16;
 
     unsafe {
-        if DIRECTION {
-            COLOR += 4;
-        } else {
-            COLOR -= 4;
-        }
+        if frame % 3 == 0 {
+            if DIRECTION {
+                COLOR += 96;
+            } else {
+                COLOR -= 96;
+            }
 
-        if COLOR == 0 {
-            DIRECTION = !DIRECTION;
-        }
-        else if COLOR == 128 {
-            DIRECTION = !DIRECTION;
-            COLOR -= 4; // avoid overflow
+            if COLOR == 0 {
+                DIRECTION = !DIRECTION;
+            }
+            else if COLOR == 96 {
+                DIRECTION = !DIRECTION;
+            }
         }
 
         frame += 1;
 
         screen_buffer.copy_from_slice(&IMAGE);
 
-        render_scrolltext(screen_buffer);
+        render_scroll_text(screen_buffer);
 
         for x in 0..WIDTH {
             for y in 0..HEIGHT {
@@ -127,10 +128,9 @@ static SCROLL_TEXT: &str = "\
 this is a webassembly/rust retrofit of an age-old intro made in a \
 completely different age of computing. hardware capacity was limited, but \
 a lot of great people were doing their best to squeeze the most out of the \
-machines. greetings goes to jojo, bagder, hal and javax. obsolete text \
-from the original intro will follow.   gameland! our favourite party is \
-alive and kicking butt. please don't be afraid to join the \
-community.                      \
+machines. greetings goes to jojo, bagder, hal, javax and metajack. obsolete \
+text from the original intro will follow.   gameland! our favourite party \
+is alive and kicking butt. please don't be afraid to join the community.                      \
 this intro was coded by plundis. the music was made by daddy freddy, big \
 hugs and smiles to you!           still not convinced? visit our \
 homepage: www.gameland.eu.org";
@@ -143,11 +143,11 @@ homepage: www.gameland.eu.org";
 //
 // Sadly, I feel more comfortable in C (memcpy & friends) on these kind of things than in Rust, but I will definitely be
 // incredibly happy to receive PRs that improves this!
-unsafe fn render_scrolltext(screen_buffer: &mut [u8])
+unsafe fn render_scroll_text(screen_buffer: &mut [u8])
 {
     let scroll_text = SCROLL_TEXT.as_bytes();
 
-    TEXT_POSITION -= 1;
+    TEXT_POSITION -= 2;
     if TEXT_POSITION < -((scroll_text.len() * 16) as isize) {
         TEXT_POSITION = WIDTH as isize;
     }
