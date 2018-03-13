@@ -75,31 +75,26 @@ fetch('gameland.wasm', { cache: 'no-cache' }).then(response =>
       window.module.stop();
     }
 
-    function exitHandler() {
+    function fullscreenChanged() {
       if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
         stopDemo();
       }
       else {
         clearCanvasAndRestart();
+        window.module.play();
       }
     }
 
+    // Imperative code starts here.
     button.addEventListener('click', function(e) {
       if (running) {
         stopDemo();
       } else {
-        window.module = new Modplayer();
-        window.module.setrepeat(true);
-        window.module.onReady = () => {
-          window.module.play();
-        }
-        window.module.load('music.mod');
-
         // FIXME: use fscreen instead of this mess.
-        document.addEventListener('webkitfullscreenchange', exitHandler, false);
-        document.addEventListener('mozfullscreenchange', exitHandler, false);
-        document.addEventListener('fullscreenchange', exitHandler, false);
-        document.addEventListener('MSFullscreenChange', exitHandler, false);
+        document.addEventListener('webkitfullscreenchange', fullscreenChanged, false);
+        document.addEventListener('mozfullscreenchange', fullscreenChanged, false);
+        document.addEventListener('fullscreenchange', fullscreenChanged, false);
+        document.addEventListener('MSFullscreenChange', fullscreenChanged, false);
 
         var elem = document.getElementById('screen');
 
@@ -111,5 +106,12 @@ fetch('gameland.wasm', { cache: 'no-cache' }).then(response =>
         }
       }
     });
+
+    window.module = new Modplayer();
+    window.module.setrepeat(true);
+    window.module.onReady = () => {
+      document.getElementById('run-wasm').disabled = false;
+    }
+    window.module.load('music.mod');
   }
 });
