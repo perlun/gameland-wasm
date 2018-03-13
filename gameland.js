@@ -78,6 +78,11 @@ fetch('gameland.wasm', { cache: 'no-cache' }).then(response =>
     function fullscreenChanged() {
       if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
         stopDemo();
+
+        document.removeEventListener('webkitfullscreenchange', fullscreenChanged, false);
+        document.removeEventListener('mozfullscreenchange', fullscreenChanged, false);
+        document.removeEventListener('fullscreenchange', fullscreenChanged, false);
+        document.removeEventListener('MSFullscreenChange', fullscreenChanged, false);
       }
       else {
         clearCanvasAndRestart();
