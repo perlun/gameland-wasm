@@ -3,7 +3,7 @@
 //
 // Heavily inspired by https://www.hellorust.com/demos/feistel/index.html
 
-fetch("gameland.wasm", {cache: "no-cache"}).then(response =>
+fetch('gameland.wasm', { cache: 'no-cache' }).then(response =>
   response.arrayBuffer()
 ).then(bytes =>
   WebAssembly.instantiate(bytes, {})
@@ -24,7 +24,7 @@ fetch("gameland.wasm", {cache: "no-cache"}).then(response =>
   var pointer = module.alloc(byteSize);
   var buffer = new Uint8Array(mod.exports.memory.buffer, pointer, byteSize);
 
-  var button = document.getElementById("run-wasm");
+  var button = document.getElementById('run-wasm');
   var canvas = document.getElementById('screen');
 
   if (canvas.getContext) {
@@ -48,7 +48,7 @@ fetch("gameland.wasm", {cache: "no-cache"}).then(response =>
       if (frame != 65536) {
         window.requestAnimationFrame(step);
       } else {
-        button.innerText = "Restart";
+        button.innerText = 'Restart';
         running = false;
       }
     }
