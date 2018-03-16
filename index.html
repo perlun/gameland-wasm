@@ -6,16 +6,24 @@
       height: 100%;
     }
     </style>
+
+    <script type="text/javascript">
+      // Needs to happen before libopenmpt gets loaded, since it uses this
+      // to locate the libopenmpt.mem.js file.
+      window['libopenmpt'] = {};
+      libopenmpt.locateFile = function(filename) {
+        return "/dist/" + filename;
+      };
+    </script>
   </head>
   <body>
     <canvas id="screen" width="320" height="200" style="border: black 1px solid; display: none;"></canvas>
     <br/>
 
-    <script src="gameland.js" type="text/javascript"></script>
-    <script src="dist/webaudio-mod-player/utils.js" type="text/javascript"></script>
-    <script src="dist/webaudio-mod-player/player.js" type="text/javascript"></script>
-    <script src="dist/webaudio-mod-player/pt.js" type="text/javascript"></script>
-
     <input type="button" id="run-wasm" value="Start" disabled="true">
+
+    <script src="gameland.js" type="text/javascript"></script>
+    <script src="dist/chiptune2.js" type="text/javascript"></script>
+    <script src="dist/libopenmpt.js" type="text/javascript"></script>
   </body>
 </html>

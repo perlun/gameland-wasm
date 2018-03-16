@@ -24,7 +24,7 @@ fetch('gameland.wasm', { cache: 'no-cache' }).then(response =>
   var pointer = module.alloc(byteSize);
   var buffer = new Uint8Array(mod.exports.memory.buffer, pointer, byteSize);
 
-  var button = document.getElementById('run-wasm');
+  var button = null;
   var canvas = document.getElementById('screen');
 
   if (canvas.getContext) {
@@ -72,7 +72,7 @@ fetch('gameland.wasm', { cache: 'no-cache' }).then(response =>
       elem.style.display = 'none';
 
       running = false;
-      window.module.stop();
+      window.player.stop();
     }
 
     function fullscreenChanged() {
@@ -86,9 +86,11 @@ fetch('gameland.wasm', { cache: 'no-cache' }).then(response =>
       }
       else {
         clearCanvasAndRestart();
-        window.module.play();
+        window.player.play(window.playerBuffer);
       }
     }
+
+    button = document.getElementById('run-wasm');
 
     // Imperative code starts here.
     button.addEventListener('click', function(e) {
@@ -112,11 +114,22 @@ fetch('gameland.wasm', { cache: 'no-cache' }).then(response =>
       }
     });
 
-    window.module = new Modplayer();
-    window.module.setrepeat(true);
-    window.module.onReady = () => {
-      document.getElementById('run-wasm').disabled = false;
+    libopenmpt.onRuntimeInitialized = function() {
+      function init() {
+        if (window.player == undefined) {
+          window.player = new ChiptuneJsPlayer(new ChiptuneJsConfig(-1));
+        }
+        else {
+          window.player.stop();
+        }
+      }
+
+      init();
+
+      window.player.load('music.mod', function(buffer) {
+        window.playerBuffer = buffer;
+        document.getElementById('run-wasm').disabled = false;
+      });
     }
-    window.module.load('music.mod');
   }
 });
