@@ -44,6 +44,6 @@ enjoy. Only works correctly in Firefox and Chrome at the moment.
 ## Credits
 
 - Uses the [are_you_excited?](http://amp.dascene.net/detail.php?detail=modules&view=1502)
-  Amiga module by Daddy Freddy (Samuli Kärkikuoma)
+  Amiga module by Daddy Freddy (Samuli Kärkiluoma)
 - JavaScript-based mod player by Jani Halme: https://github.com/jhalme/webaudio-mod-player
 - 8x8 font from https://github.com/dhepper/font8x8/blob/master/font8x8_basic.h
